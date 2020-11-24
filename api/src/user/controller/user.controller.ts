@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path = require('path');
 import { join } from 'path';
 import { UserIsUserGuard } from 'src/auth/guards/UserIsUser.guard';
+import { UserSecurityService } from 'src/auth/services/user-security/user-security.service';
 
 export const storage = {
     storage: diskStorage({
@@ -30,11 +31,11 @@ export const storage = {
 @Controller('users')
 export class UserController {
 
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService, private userSecurityService: UserSecurityService) { }
 
     @Post()
     create(@Body() user: User): Observable<User | Object> {
-        return this.userService.create(user).pipe(
+        return this.userSecurityService.create(user).pipe(
             map((user: User) => user),
             catchError(err => of({ error: err.message }))
         );
@@ -42,7 +43,7 @@ export class UserController {
 
     @Post('login')
     login(@Body() user: User): Observable<Object> {
-        return this.userService.login(user).pipe(
+        return this.userSecurityService.login(user).pipe(
             map((jwt: string) => {
                 return { access_token: jwt };
             })
