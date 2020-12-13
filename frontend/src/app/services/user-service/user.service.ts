@@ -62,9 +62,8 @@ export class UserService {
 
     params = params.append('page', String(page));
     params = params.append('limit', String(size));
-    params = params.append('username', username);
 
-    return this.http.get('/api/users', {params}).pipe(
+    return this.http.get(`/api/users/search/by/username/${username}`, {params}).pipe(
       map((userData: UserData) => userData),
       catchError(err => throwError(err))
     )

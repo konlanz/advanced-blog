@@ -19,25 +19,16 @@ export class UsersComponent implements OnInit {
   constructor(private userService: UserService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.initDataSource();
-  }
-
-  initDataSource() {
-    this.userService.findAll(1, 10).pipe(
-      map((userData: UserData) => this.dataSource = userData)
-    ).subscribe();
+    this.findAll(1,10);
   }
 
   onPaginateChange(event: PageEvent) {
     let page = event.pageIndex;
     let size = event.pageSize;
+    page = page +1;
 
-
-    if(this.filterValue == null) {
-      page = page +1;
-      this.userService.findAll(page, size).pipe(
-        map((userData: UserData) => this.dataSource = userData)
-      ).subscribe();
+    if(this.filterValue === null || this.filterValue === '') {
+      this.findAll(page, size);
     } else {
       this.userService.paginateByName(page, size, this.filterValue).pipe(
         map((userData: UserData) => this.dataSource = userData)
@@ -47,10 +38,19 @@ export class UsersComponent implements OnInit {
   }
 
   findByName(username: string) {
-    console.log(username);
-    this.userService.paginateByName(0, 10, username).pipe(
+    if(username === null || username === '') {
+      this.findAll(1, 10);
+    } else {
+      this.userService.paginateByName(1, 10, username).pipe(
+        map((userData: UserData) => this.dataSource = userData)
+      ).subscribe()  
+    }
+  }
+
+  findAll(page: number, size: number) {
+    this.userService.findAll(page, size).pipe(
       map((userData: UserData) => this.dataSource = userData)
-    ).subscribe()
+    ).subscribe();
   }
 
   navigateToProfile(id) {

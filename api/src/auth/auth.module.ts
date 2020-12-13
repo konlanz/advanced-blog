@@ -1,15 +1,18 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule} from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './services/auth/auth.service';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtAuthGuard } from './guards/jwt-guard';
 import { JwtStrategy } from './guards/jwt-strategy';
 import { UserModule } from 'src/user/user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from 'src/user/models/user.entity';
+import { UserSecurityService } from './services/user-security/user-security.service';
 
 @Module({
     imports: [
-        forwardRef(() => UserModule),
+        TypeOrmModule.forFeature([UserEntity]),
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
@@ -19,7 +22,7 @@ import { UserModule } from 'src/user/user.module';
             })
         })
     ],
-    providers: [AuthService, RolesGuard, JwtAuthGuard, JwtStrategy ],
-    exports: [AuthService]
+    providers: [AuthService, RolesGuard, JwtAuthGuard, JwtStrategy, UserSecurityService ],
+    exports: [AuthService, UserSecurityService]
 })
 export class AuthModule { }

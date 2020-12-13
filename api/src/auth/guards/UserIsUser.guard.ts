@@ -3,14 +3,14 @@ import { Observable } from "rxjs";
 import { UserService } from "src/user/service/user.service";
 import { User } from "src/user/models/user.interface";
 import { map } from "rxjs/operators";
+import { UserSecurityService } from "../services/user-security/user-security.service";
 
 
 @Injectable()
 export class UserIsUserGuard implements CanActivate{
 
     constructor(
-        @Inject(forwardRef(() => UserService))
-        private userService: UserService
+        private userSecurityService: UserSecurityService
     ) {
 
     }
@@ -21,7 +21,7 @@ export class UserIsUserGuard implements CanActivate{
         const params = request.params;
         const user: User = request.user;
 
-        return this.userService.findOne(user.id).pipe(
+        return this.userSecurityService.findOne(user.id).pipe(
             map((user: User) => {
                 let hasPermission = false;
                 
